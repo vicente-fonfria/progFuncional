@@ -36,9 +36,26 @@ edad (d1, m1, a1) (d2, m2, a2) = a2 - a1 - if m2 < m1 || (m2 == m1 && d2 < d1) t
 
 -- (a) Represente la informaci´on de cada estudiante a trav´es de tuplas.
 
-type curso = (String, Int, Int)
+type Curso = (String, Int, Int)
 
-type estudiante = (String, Int, Int, [curso])
+type Estudiante = (String, Int, Int, [Curso])
 
 -- (b) Escriba una funci´on que dado un estudiante retorne su nombre y CI.
-obtenerNombreCI :: estudiante -> (String, Int) 
+obtenerNombreCI :: Estudiante -> (String, Int) 
+obtenerNombreCI (nombre, ci, _, _) = (nombre, ci)
+
+-- (c) Escriba una funci´on que dado un estudiante retorne su a˜no de ingreso.
+
+obtenerAnioIngreso :: Estudiante -> Int
+obtenerAnioIngreso (_,_,anioIngreso,_) = anioIngreso 
+
+-- (d) Escriba una funci´on que dado un estudiante y una nota retorne una
+-- lista con los c´odigos de los cursos que aprob´o con esa nota. (Sugerencia: use comprensi´on de listas).
+
+cursoAprobadoConNota :: Estudiante -> Int -> [Int]
+cursoAprobadoConNota (_, _, _, cursos) nota = [codigo | (_, codigo, nota') <- cursos, nota' == nota]
+
+-- (e) Escriba una funci´on que dada una lista de estudiantes retorne una
+-- lista de pares (nombre, CI) de aquellos estudiantes ingresados en
+-- un determinado a˜no dado como par´ametro. (Sugerencia: use comprensi´on de listas).
+
