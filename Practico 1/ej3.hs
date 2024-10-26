@@ -36,7 +36,9 @@ edad (d1, m1, a1) (d2, m2, a2) = a2 - a1 - if m2 < m1 || (m2 == m1 && d2 < d1) t
 
 -- (a) Represente la informaci´on de cada estudiante a trav´es de tuplas.
 
-curso:: (String, Int, Int)
+type curso = (String, Int, Int)
 
-estudiante:: (String, Int, Int, [curso])
+type estudiante = (String, Int, Int, [curso])
 
+-- (b) Escriba una funci´on que dado un estudiante retorne su nombre y CI.
+obtenerNombreCI :: estudiante -> (String, Int) 
