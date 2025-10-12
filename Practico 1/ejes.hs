@@ -1,3 +1,5 @@
+import System.Win32 (COORD(yPos))
+
 -- Programacion Funcional - Practico 1
 -- 1. Defina una funcion sumsqrs que tome 3 numeros y retorne la suma de los
 -- cuadrados de los dos mayores.
@@ -181,24 +183,67 @@ multiplicarParPorEscalar (ParesOrdenados x y) escalar = getParesOrdenados (x*esc
 -- Defina una funcion que dado un entero x devuelve una tupla con los
 -- numeros y y z .
 getYZ :: Integer -> (Integer, Integer)
-getYZ x = (x -10z,) -- no se
+getYZ x = if mod x 10 > 5 then (-10 + mod x 10,div x 10 + 1) else (mod x 10, div x 10) 
 
 
 -- 10. Deseamos representar numeros racionales y operaciones sobre ellos. Los
--- racionales son representados por pares de enteros cuya segunda componente es distIntegera de cero. Cada racional tiene infinitas representaciones,
--- pero existe la llamada representacion canonica en la que la segunda componente del par de enteros es mayor que cero y ambos enteros son primos
+-- racionales son representados por pares de enteros cuya segunda componente es distinta de cero. 
+-- Cada racional tiene infinitas representaciones,
+-- pero existe la llamada representacion canonica en la que la segunda componente del par de enteros es mayor que cero 
+-- y ambos enteros son primos
 -- entre si.
 -- (a) Defina el tipo racional
+type Racional = (Integer, Integer)
 -- (b) Defina una funcion que dado un par de enteros, el segundo de los
--- cuales es distIntegero de cero, retorne un racional en su representacion
+-- cuales es distinto de cero, retorne un racional en su representacion
 -- canonica.
+
+-- abs :: Num -> Num
+-- abs x = if x > 0 then x else -x
+
+mcd :: Integer -> Integer -> Integer
+mcd x 0 = abs x
+mcd x y = mcd y (mod x y)
+
+
+
+getRepresentacionCanonica :: Racional -> Racional
+getRepresentacionCanonica (x,y) = 
+  let d = gcd (abs x) (abs y)
+      x' = div x d
+      y' = div y d 
+  in if y' < 0 then (-x',-y') else (x',y')
+
 -- (c) Defina las operaciones de suma, resta, multiplicacion, y negacion de
--- racionales, e Integer2rac, que convierte un entero en un racional. Dichas
+-- racionales, e int2rac, que convierte un entero en un racional. Dichas
 -- operaciones deben devolver representaciones canonicas como resultado.
 -- Nota: Puede usar la funcion gcd (definida en el Prelude) la cual
 -- computa el maximo comun divisor de dos numeros.
+sumaRacional :: Racional -> Racional -> Racional
+sumaRacional (x,y) (x2,y2) = getRepresentacionCanonica (x*y2 + y*x2, y*y2)
+
+restaRacional :: Racional -> Racional -> Racional
+restaRacional (x,y) (x2,y2) = getRepresentacionCanonica (x*y2 - y*x2, y*y2)
+
+multiplicacionRacional :: Racional -> Racional -> Racional
+multiplicacionRacional (x,y) (x2,y2) = getRepresentacionCanonica (x*x2, y*y2)
+
+negacionRacional :: Racional -> Racional
+negacionRacional (x,y) = (-x,y)
+
+int2rac :: Integer -> Racional
+int2rac n = getRepresentacionCanonica (n,1)
+
 -- 11. Dado el siguiente tipo para representar triangulos:
--- data Triangulo = Equi Integer | Iso Integer Integer | Esca Integer Integer Integer
--- Defina la funcion mkTriangulo que dados tres enteros positivos, que representan a los lados de un triangulo valido, retorna un valor de tipo
--- Triangulo.
+data Triangulo = Equi Integer | Iso Integer Integer | Esca Integer Integer Integer
+-- Defina la funcion mkTriangulo que dados tres enteros positivos, que representan a los lados de un triangulo valido, 
+--retorna un valor de tipo Triangulo.
 -- 2
+
+mkTriangulo :: Integer -> Integer -> Integer -> Triangulo
+mkTriangulo a b c
+  | a == b && b == c = Equi a
+  | a == b || b == c || c == a = Iso a b
+  | otherwise = Esca a b c
+
+
