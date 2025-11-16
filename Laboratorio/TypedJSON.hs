@@ -1,7 +1,6 @@
-{- Grupo: X
+{- Grupo: 11
    Integrante(s):
-     Apellido, Nombre, XXXXXXXX
-     Apellido, Nombre, XXXXXXXX
+     Fonfría, Vicente, 50889288
 -}
 
 module TypedJSON where
