@@ -12,22 +12,43 @@ import ParserCombinators
 
 -- AST para JSON
 data JSON
-    = JString  String
+ = JString  String
     | JNumber  JSONNumber
     | JBoolean Bool
     | JNull
     | JObject  (Object JSON)
     | JArray   Array
 
-type Object a   = [(Key, a)]
-type Array      = [JSON]
-type Key        = String
+type Object a = [(Key, a)]
+type Array = [JSON]
+type Key = String
 type JSONNumber = Integer
 
 
 -- instancia de Show
 instance Show JSON where
-    show = undefined
+  show (JString s) = show s
+  show (JNumber n) = show n
+  show (JBoolean True) = "true"
+  show (JBoolean False) = "false"
+  show JNull = "null"
+
+  show (JObject campos) =
+    "{" ++ mostrarCampos campos ++ "}"
+    where
+      mostrarCampos [] = ""
+      mostrarCampos [(k,v)] =
+        show k ++ ":" ++ show v
+      mostrarCampos ((k,v):xs) =
+        show k ++ ":" ++ show v ++ "," ++ mostrarCampos xs
+
+  show (JArray vals) =
+    "[" ++ mostrarVals vals ++ "]"
+    where
+      mostrarVals [] = ""
+      mostrarVals [x] = show x
+      mostrarVals (x:xs) = show x ++ "," ++ mostrarVals xs
+
 
 -- Instancia de read.
 -- Se hace el parsing que se define más adelante.
@@ -47,7 +68,7 @@ instance Read JSON where
 importJSON :: FilePath -> IO (Maybe JSON)
 importJSON f = do
   file <- readFile f
-  let lexed  = lexer file
+  let lexed = lexer file
   let parsed = runP pJSON <$> lexed
   case parsed of
     Just ((t,[]):_) -> return (Just t)
@@ -64,7 +85,7 @@ importJSON f = do
 
 -- conjunto de tokens
 data JSONToken
-    = TString String
+ = TString String
     | TNum Integer
     | TLSqrBr
     | TRSqrBr
@@ -82,40 +103,40 @@ data JSONToken
 -- todavía, son strings a los que luego tratamos de tokenizar con |tokenize|)
 cutInput :: String -> [String]
 cutInput []
-    = []
+ = []
 cutInput ('\"':cs)
-    = let (wd, tl) = span (/= '\"') cs
+ = let (wd, tl) = span (/ = '\"') cs
       in ("\""++ wd ++ "\"") : cutInput (drop 1 tl)
 cutInput ('t':'r':'u':'e':cs)
-    = "true" : cutInput cs
+ = "true" : cutInput cs
 cutInput ('f':'a':'l':'s':'e':cs)
-    = "false" : cutInput cs
+ = "false" : cutInput cs
 cutInput ('n':'u':'l':'l':cs)
-    = "null" : cutInput cs
+ = "null" : cutInput cs
 cutInput s@(c:cs)
     | isNumChar c = let (wd, tl) = span isNumChar s
-                    in if wd /=  []
+                    in if wd / =  []
                        then wd : cutInput tl
                        else [c]:cutInput cs
     | otherwise = [c] : cutInput cs
-    where isNumChar a = isDigit a || a == '.'
+    where isNumChar a = isDigit a || a = = '.'
 
 -- tokenize crea un token (o falla) a partir de una cadena
 tokenize :: String -> Maybe JSONToken
 tokenize s@('\"':cs) = Just $ TString $ init cs
-tokenize "{"         = Just TLCurlyBr
-tokenize "}"         = Just TRCurlyBr
-tokenize "["         = Just TLSqrBr
-tokenize "]"         = Just TRSqrBr
-tokenize ","         = Just TComma
-tokenize "null"      = Just TNull
-tokenize "true"      = Just TTrue
-tokenize "false"     = Just TFalse
-tokenize ":"         = Just TColon
+tokenize "{" = Just TLCurlyBr
+tokenize "}" = Just TRCurlyBr
+tokenize "[" = Just TLSqrBr
+tokenize "]" = Just TRSqrBr
+tokenize "," = Just TComma
+tokenize "null" = Just TNull
+tokenize "true" = Just TTrue
+tokenize "false" = Just TFalse
+tokenize ":" = Just TColon
 tokenize s@(c:cs)
          | isDigit c = Just . TNum $ (read s :: Integer)
          | otherwise = Nothing
-tokenize _           = Nothing
+tokenize _ = Nothing
 
 
 -- el analizador léxico completo: corta la entrada (aplicando cutInput),
@@ -136,14 +157,14 @@ pToken t =
     Parser $ \s ->
         case s of
           []      -> []
-          (t':ts) -> if   t == t'
+          (t':ts) -> if   t = = t'
                      then [(t, ts)]
                      else []
 
 -- reconoce una cadena
 pString :: JParser JSONToken
 pString
-  = Parser $ \s ->
+ = Parser $ \s ->
     case s of
       (js@(TString s):ts) -> [(js, ts)]
       _                   -> []
@@ -169,7 +190,7 @@ pJNumber = Parser $ \s ->
     _ -> []
 
 pJObject
-   =  (do pToken TLCurlyBr
+ =  (do pToken TLCurlyBr
           f  <- pField
           fs <- pList (pToken TComma >> pField)
           pToken TRCurlyBr
@@ -212,7 +233,7 @@ pJBoolean =
       (pToken TTrue >> return (JBoolean True))
   <|> (pToken TFalse >> return (JBoolean False))
 
-pJNull    = pToken TNull >> return (JNull)
+pJNull = pToken TNull >> return (JNull)
 
 
 {-

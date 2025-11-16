@@ -5,8 +5,8 @@ import Control.Monad
 data Parser s a = Parser {runP :: s -> [(a,s)]}
 
 instance Monad (Parser s) where
-  return   = pure 
-  p >>= q  = Parser $ \s -> concat [runP (q a) s' | (a,s') <- runP p s]
+  return = pure 
+  p >> = q = Parser $ \s -> concat [runP (q a) s' | (a,s') <- runP p s]
 
 instance Applicative (Parser s) where
     (<*>) = ap

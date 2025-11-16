@@ -1,7 +1,7 @@
 -- tipo Empleado
 
 juan :: (String, Int, Int)
-juan  = ("Juan", 23, 60000)
+juan = ("Juan", 23, 60000)
 
 pedro :: (String, Int, Int)
 pedro = ("Pedro", 44, 60000)
@@ -15,23 +15,23 @@ esPedro (_,        _,  _) = False
 
 -- type Empleado = (String, Int, Int)
 type Empleado = (Nombre, Edad, Salario)
-type Nombre   = String
-type Edad     = Int
-type Salario  = Int
+type Nombre = String
+type Edad = Int
+type Salario = Int
 
 jose :: Empleado
 jose = ("Jose", 36, 65000)
 
 mayor :: Empleado -> Empleado -> Nombre
 mayor (n1,e1,_) (n2,e2,_) 
-        | e1 > e2   = n1
+        | e1 > e2 = n1
         | otherwise = n2 
 
 
 
 
-type Posicion  = (Float, Float)
-type Angulo    = Float
+type Posicion = (Float, Float)
+type Angulo = Float
 type Distancia = Float
 
 mover :: Distancia -> Angulo -> Posicion -> Posicion
@@ -45,7 +45,7 @@ type Empleados = [Empleado]
 empleados :: Empleados 
 empleados = [juan,pedro,jose]
 
-isEven n = n `mod` 2 == 0
+isEven n = n `mod` 2 = = 0
 
 l1 = [x | x <- [1,2,3,4]]
 l2 = [x | x <- [1,2,3,4], isEven x]
@@ -64,10 +64,10 @@ data PuntoCardinal = Norte | Sur | Este | Oeste
 data Empleado' = Empleado String Int Int
       deriving (Show,Eq)
 
-data Sueldo  =  Asalariado  Int
+data Sueldo =  Asalariado  Int
              |  Jornalero   [Int] 
       deriving (Show,Eq)
 
 liquidar :: Sueldo -> Int
-liquidar (Asalariado  m)  = m
+liquidar (Asalariado  m) = m
 liquidar (Jornalero   js) = sum js

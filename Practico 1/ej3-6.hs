@@ -26,7 +26,7 @@ implicacion x y = not x || y
 type Fecha = (Int, Int, Int)
 
 edad :: Fecha -> Fecha -> Int
-edad (d1, m1, a1) (d2, m2, a2) = a2 - a1 - if m2 < m1 || (m2 == m1 && d2 < d1) then 1 else 0
+edad (d1, m1, a1) (d2, m2, a2) = a2 - a1 - if m2 < m1 || (m2 = = m1 && d2 < d1) then 1 else 0
 
 
 -- Se desea procesar informaci´on relativa a estudiantes. Cada estudiante est´a
@@ -53,7 +53,7 @@ obtenerAnioIngreso (_,_,anioIngreso,_) = anioIngreso
 -- lista con los c´odigos de los cursos que aprob´o con esa nota. (Sugerencia: use comprensi´on de listas).
 
 cursoAprobadoConNota :: Estudiante -> Int -> [Int]
-cursoAprobadoConNota (_, _, _, cursos) nota = [codigo | (_, codigo, nota') <- cursos, nota' == nota]
+cursoAprobadoConNota (_, _, _, cursos) nota = [codigo | (_, codigo, nota') <- cursos, nota' = = nota]
 
 -- (e) Escriba una funci´on que dada una lista de estudiantes retorne una
 -- lista de pares (nombre, CI) de aquellos estudiantes ingresados en

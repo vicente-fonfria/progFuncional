@@ -1,4 +1,5 @@
-{ "nombre" : "Haskell",
+{ 
+  "nombre" : "Haskell",
   "apellido" : "Curry",
   "CI" : 12345678,
   "cursos" :
