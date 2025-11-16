@@ -132,10 +132,11 @@ aprobados est =
           case fromJArray cursosVal of
             Nothing      -> Nothing
             Just cursos  ->
-              let cursosAprob = filter cursoAprobado cursos
-                  nuevoCursos = mkJArray cursosAprob
-                  nuevoObj    = insertKV ("cursos", nuevoCursos) obj
-              in Just (mkJObject nuevoObj)
+              let cursosAprob   = filter cursoAprobado cursos
+                  nuevoCursos   = mkJArray cursosAprob
+                  objActualizado =
+                    reemplazarCursos nuevoCursos obj
+              in Just (mkJObject objActualizado)
 
 -- curso aprobado si tiene nota >= 3
 cursoAprobado :: JSON -> Bool
@@ -149,6 +150,13 @@ cursoAprobado c =
           case fromJNumber jNota of
             Nothing  -> False
             Just n   -> n >= 3
+
+-- reemplaza el valor del campo "cursos" manteniendo orden y resto igual
+reemplazarCursos :: JSON -> Object JSON -> Object JSON
+reemplazarCursos nuevos [] = []
+reemplazarCursos nuevos ((k,v):xs)
+  | k == "cursos" = (k, nuevos) : xs
+  | otherwise     = (k, v) : reemplazarCursos nuevos xs
 
 -- obtiene arreglo con cursos rendidos en un año dado
 enAnio :: Integer -> JSON -> Maybe JSON

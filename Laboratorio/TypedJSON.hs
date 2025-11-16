@@ -113,7 +113,7 @@ typeWf TyBool = True
 typeWf TyNull = True
 typeWf (TyArray t) = typeWf t
 typeWf (TyObject obj) =
-  objectWf obj && tiposObjetoWf obj
+  not (null obj) && objectWf obj && tiposObjetoWf obj
 
 -- dado un valor JSON v, y un tipo t, decide si v tiene tipo t.
 hasType :: JSON -> JSONType -> Bool
