@@ -41,7 +41,7 @@ type Mes = Integer
 type Año = Integer
 
 hayAño :: Fecha -> Fecha -> Integer
-hayAño (d,m,_) (d2,m2,_) = if m2 > m || m == m2 && d2 > = d then 1 else 0
+hayAño (d,m,_) (d2,m2,_) = if m2 > m || m == m2 && d2 >= d then 1 else 0
 
 edad :: Fecha -> Fecha -> Integer
 edad (d,m,a) (d2,m2,a2) = a2 - a - 1 + hayAño (d,m,0) (d2,m2,0) 
@@ -147,7 +147,7 @@ francescoliAlg = Estudiante "Francescoli" 50889277 2019 [Curso "mat1" 1 9, Curso
 estudiantesAlg :: [Estudiante]
 estudiantesAlg = [estAlg1, estAlg2, estAlg3, francescoliAlg]
 -- 8. Deseamos representar pares Internamente ordenados, que son pares de
--- numeros reales (r, s) tales que r < = s.
+-- numeros reales (r, s) tales que r <= s.
 -- 1
 -- (a) Defina el tipo de los pares ordenados
 
@@ -178,7 +178,7 @@ multiplicarParPorEscalar (ParesOrdenados x y) escalar = getParesOrdenados (x*esc
 
 -- 9. Todo numero entero x se puede descomponer de manera unica en terminos
 -- de dos numeros enteros y y z , tales que:
--- • −5 < y < = 5
+-- • −5 < y <= 5
 -- • x = y + 10 × z.
 -- Defina una funcion que dado un entero x devuelve una tupla con los
 -- numeros y y z .

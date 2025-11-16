@@ -95,7 +95,7 @@ filterArray fnPredicado arr = filter fnPredicado arr
 insertKV :: (Key, v) -> Object v -> Object v
 insertKV kv [] = [kv]
 insertKV kv@(k, _) ((k', v') : xs)
-  | k < = k' = kv : (k', v') : xs
+  | k <= k' = kv : (k', v') : xs
   | otherwise = (k', v') : insertKV kv xs
 
 

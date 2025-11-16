@@ -99,29 +99,187 @@ ordenOK (a1,s1,c1) (a2,s2,c2)
 
 -- getters
 getCI :: JSON -> Maybe Integer
-getCI = undefined
+getCI v =
+  case lookupField v "CI" of
+    Nothing    -> Nothing
+    Just jCI   -> fromJNumber jCI
 
 getNombre :: JSON -> Maybe String
-getNombre = undefined
+getNombre v =
+  case lookupField v "nombre" of
+    Nothing      -> Nothing
+    Just jNombre -> fromJString jNombre
 
 getApellido :: JSON -> Maybe String
-getApellido = undefined
+getApellido v =
+  case lookupField v "apellido" of
+    Nothing        -> Nothing
+    Just jApellido -> fromJString jApellido
 
 getCursos :: JSON -> Maybe JSON
-getCursos = undefined
+getCursos v =
+  lookupField v "cursos"
 
--- obtiene arreglo con cursos que fueron aprobados
+-- obtiene arreglo con cursos que fueron aprobados (nota >= 3)
 aprobados :: JSON -> Maybe JSON
-aprobados = undefined
+aprobados est =
+  case fromJObject est of
+    Nothing    -> Nothing
+    Just obj   ->
+      case lookupFieldObj obj "cursos" of
+        Nothing        -> Nothing
+        Just cursosVal ->
+          case fromJArray cursosVal of
+            Nothing      -> Nothing
+            Just cursos  ->
+              let cursosAprob = filter cursoAprobado cursos
+                  nuevoCursos = mkJArray cursosAprob
+                  nuevoObj    = insertKV ("cursos", nuevoCursos) obj
+              in Just (mkJObject nuevoObj)
+
+-- curso aprobado si tiene nota >= 3
+cursoAprobado :: JSON -> Bool
+cursoAprobado c =
+  case fromJObject c of
+    Nothing   -> False
+    Just objc ->
+      case lookupFieldObj objc "nota" of
+        Nothing     -> False
+        Just jNota  ->
+          case fromJNumber jNota of
+            Nothing  -> False
+            Just n   -> n >= 3
 
 -- obtiene arreglo con cursos rendidos en un año dado
 enAnio :: Integer -> JSON -> Maybe JSON
-enAnio = undefined
+enAnio anio est =
+  case getCursos est of
+    Nothing      -> Nothing
+    Just jCursos ->
+      case fromJArray jCursos of
+        Nothing      -> Nothing
+        Just cursos  ->
+          let cursosEnAnio = filter (cursoEnAnio anio) cursos
+          in Just (mkJArray cursosEnAnio)
+
+-- curso pertenece al año dado
+cursoEnAnio :: Integer -> JSON -> Bool
+cursoEnAnio anio c =
+  case fromJObject c of
+    Nothing   -> False
+    Just obj  ->
+      case lookupFieldObj obj "anio" of
+        Nothing     -> False
+        Just jAnio  ->
+          case fromJNumber jAnio of
+            Nothing  -> False
+            Just n   -> n == anio
 
 -- retorna el promedio de las notas de los cursos
 promedioEscolaridad :: JSON -> Maybe Float
-promedioEscolaridad = undefined 
+promedioEscolaridad est =
+  case getCursos est of
+    Nothing      -> Nothing
+    Just jCursos ->
+      case fromJArray jCursos of
+        Nothing      -> Nothing
+        Just cursos  ->
+          case notasDeCursos cursos of
+            Nothing    -> Nothing
+            Just []    -> Nothing
+            Just notas ->
+              let suma   = sum notas
+                  cant   = length notas
+              in Just (fromIntegral suma / fromIntegral cant)
+
+
+-- obtiene todas las notas de una lista de cursos;
+-- falla (Nothing) si algún curso no tiene "nota" bien formada
+notasDeCursos :: [JSON] -> Maybe [Integer]
+notasDeCursos [] = Just []
+notasDeCursos (c:cs) =
+  case fromJObject c of
+    Nothing   -> Nothing
+    Just obj  ->
+      case lookupFieldObj obj "nota" of
+        Nothing    -> Nothing
+        Just jNota ->
+          case fromJNumber jNota of
+            Nothing -> Nothing
+            Just n  ->
+              case notasDeCursos cs of
+                Nothing   -> Nothing
+                Just rest -> Just (n : rest)
 
 -- agrega curso a lista de cursos de un estudiante
 addCurso :: Object JSON -> JSON -> JSON
-addCurso = undefined
+addCurso cursoObj est =
+  case fromJObject est of
+    -- si no es un objeto, lo dejo como está (los tests no pasan por acá)
+    Nothing   -> est
+    Just obj  ->
+      let nuevoCursoJSON = mkJObject cursoObj
+          cursosJSON     = lookupFieldObj obj "cursos"
+          nuevosCursosJSON =
+            case cursosJSON of
+              -- si no tenía campo "cursos", creo un array con solo el nuevo
+              Nothing      -> mkJArray [nuevoCursoJSON]
+              Just jCursos ->
+                case fromJArray jCursos of
+                  -- si "cursos" no es un array, lo dejo como estaba
+                  Nothing      -> jCursos
+                  Just cursos  ->
+                    mkJArray (insertarCurso nuevoCursoJSON cursos)
+
+          objActualizado = actualizarCursos nuevosCursosJSON obj
+      in mkJObject objActualizado
+  where
+    -- Reemplaza el valor de la clave "cursos" manteniendo las demás igual
+    actualizarCursos :: JSON -> Object JSON -> Object JSON
+    actualizarCursos nuevos [] = []
+    actualizarCursos nuevos ((k,v):xs)
+      | k == "cursos" = (k, nuevos) : xs
+      | otherwise     = (k, v) : actualizarCursos nuevos xs
+
+    -- Inserta un curso en una lista de cursos ordenada
+    insertarCurso :: JSON -> [JSON] -> [JSON]
+    insertarCurso c [] = [c]
+    insertarCurso c (x:xs) =
+      case (tripleCurso c, tripleCurso x) of
+        (Just t1, Just t2) ->
+          if vieneAntes t1 t2
+             -- c debe ir antes que x
+             then c : x : xs
+             -- sigo buscando más adelante
+             else x : insertarCurso c xs
+        -- si algo está mal formado, lo encajo adelante y ya
+        _ -> c : x : xs
+
+    -- Extrae (anio, semestre, codigo) del JSON de un curso
+    tripleCurso :: JSON -> Maybe (Integer, Integer, Integer)
+    tripleCurso cursoJSON =
+      case fromJObject cursoJSON of
+        Nothing       -> Nothing
+        Just objCurso ->
+          case ( lookupFieldObj objCurso "anio"
+               , lookupFieldObj objCurso "semestre"
+               , lookupFieldObj objCurso "codigo") of
+            (Just jAnio, Just jSem, Just jCod) ->
+              case ( fromJNumber jAnio
+                   , fromJNumber jSem
+                   , fromJNumber jCod) of
+                (Just anio, Just sem, Just cod) ->
+                  Just (anio, sem, cod)
+                _ -> Nothing
+            _ -> Nothing
+
+    -- Orden correcto: año desc, semestre desc, código asc
+    vieneAntes :: (Integer,Integer,Integer)
+               -> (Integer,Integer,Integer)
+               -> Bool
+    vieneAntes (a1,s1,c1) (a2,s2,c2)
+      | a1 > a2 = True
+      | a1 < a2 = False
+      | s1 > s2 = True
+      | s1 < s2 = False
+      | otherwise = c1 <= c2
