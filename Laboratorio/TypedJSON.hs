@@ -33,7 +33,7 @@ sinDuplicados (x:xs)
 noDupKeys :: Object a -> Bool
 noDupKeys o =
   let ks = keysOf o
-  in ks = = sinDuplicados ks
+  in ks == sinDuplicados ks
 
 
 -- dado un valor JSON se infiere el tipo. Se devuelve
@@ -69,7 +69,7 @@ todosDelMismoTipo _ [] = True
 todosDelMismoTipo t (y:ys) =
   case typeOf y of
     Nothing  -> False
-    Just ty  -> ty = = t && todosDelMismoTipo t ys
+    Just ty  -> ty == t && todosDelMismoTipo t ys
 
 
 -- objeto: tipar cada campo (k, v) -> (k, tipoDeV)

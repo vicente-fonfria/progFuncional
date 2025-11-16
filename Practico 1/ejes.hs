@@ -41,7 +41,7 @@ type Mes = Integer
 type Año = Integer
 
 hayAño :: Fecha -> Fecha -> Integer
-hayAño (d,m,_) (d2,m2,_) = if m2 > m || m = = m2 && d2 > = d then 1 else 0
+hayAño (d,m,_) (d2,m2,_) = if m2 > m || m == m2 && d2 > = d then 1 else 0
 
 edad :: Fecha -> Fecha -> Integer
 edad (d,m,a) (d2,m2,a2) = a2 - a - 1 + hayAño (d,m,0) (d2,m2,0) 
@@ -73,14 +73,14 @@ getAñoIngreso (_,_,añoIngreso,_) = añoIngreso
 -- (d) Escriba una funcion que dado un estudiante y una nota retorne una
 -- lista con los codigos de los cursos que aprobo con esa nota. (Sugerencia: use comprension de listas).
 getCursoTuplasNotas :: EstudianteTupla -> Nota -> [Codigo]
-getCursoTuplasNotas (_, _, _, cursos) nota = [codigo | (_, codigo, notaCursoTupla) <- cursos, notaCursoTupla = = nota]
+getCursoTuplasNotas (_, _, _, cursos) nota = [codigo | (_, codigo, notaCursoTupla) <- cursos, notaCursoTupla == nota]
 
 
 -- (e) Escriba una funcion que dada una lista de estudiantes retorne una
 -- lista de pares (nombre, CI) de aquellos estudiantes ingresados en
 -- un determinado ano dado como parametro. (Sugerencia: use comprension de listas).
 getEstudianteTuplasPorAñoIngreso :: [EstudianteTupla] -> AñoIngreso -> [(Nombre, CI)]
-getEstudianteTuplasPorAñoIngreso estudiantes añoBuscado = [(nombre, ci) | (nombre, ci, estudianteAñoIngreso, _) <- estudiantes, añoBuscado = = estudianteAñoIngreso]
+getEstudianteTuplasPorAñoIngreso estudiantes añoBuscado = [(nombre, ci) | (nombre, ci, estudianteAñoIngreso, _) <- estudiantes, añoBuscado == estudianteAñoIngreso]
 
 -- Mockup data para probar el ejercicio 6
 
@@ -122,13 +122,13 @@ getAñoIngresoAlg (Estudiante _ _ añoIngreso _) = añoIngreso
 -- (d) Escriba una funcion que dado un estudiante y una nota retorne una
 -- lista con los codigos de los cursos que aprobo con esa nota. (Sugerencia: use comprension de listas).
 getCursosPorNota :: Estudiante -> Nota -> [Codigo]
-getCursosPorNota (Estudiante _ _ _ cursos) notaBuscada = [codigo | (Curso nombre codigo nota) <- cursos, nota = = notaBuscada]
+getCursosPorNota (Estudiante _ _ _ cursos) notaBuscada = [codigo | (Curso nombre codigo nota) <- cursos, nota == notaBuscada]
 
 -- (e) Escriba una funcion que dada una lista de estudiantes retorne una
 -- lista de pares (nombre, CI) de aquellos estudiantes ingresados en
 -- un determinado ano dado como parametro. (Sugerencia: use comprension de listas).
 getEstudiantesPorAñoIngreso :: [Estudiante] -> AñoIngreso -> [NombreYCI]
-getEstudiantesPorAñoIngreso estudiantes añoIngresoBuscado = [NombreYCI nombre ci | (Estudiante nombre ci añoIngreso _) <- estudiantes, añoIngresoBuscado = = añoIngreso]
+getEstudiantesPorAñoIngreso estudiantes añoIngresoBuscado = [NombreYCI nombre ci | (Estudiante nombre ci añoIngreso _) <- estudiantes, añoIngresoBuscado == añoIngreso]
 
 -- Mockup data para probar el ejercicio 7
 
@@ -242,8 +242,8 @@ data Triangulo = Equi Integer | Iso Integer Integer | Esca Integer Integer Integ
 
 mkTriangulo :: Integer -> Integer -> Integer -> Triangulo
 mkTriangulo a b c
-  | a = = b && b = = c = Equi a
-  | a = = b || b = = c || c = = a = Iso a b
+  | a == b && b == c = Equi a
+  | a == b || b == c || c == a = Iso a b
   | otherwise = Esca a b c
 
 

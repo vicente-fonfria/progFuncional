@@ -105,7 +105,7 @@ cutInput :: String -> [String]
 cutInput []
  = []
 cutInput ('\"':cs)
- = let (wd, tl) = span (/ = '\"') cs
+ = let (wd, tl) = span (/= '\"') cs
       in ("\""++ wd ++ "\"") : cutInput (drop 1 tl)
 cutInput ('t':'r':'u':'e':cs)
  = "true" : cutInput cs
@@ -115,11 +115,11 @@ cutInput ('n':'u':'l':'l':cs)
  = "null" : cutInput cs
 cutInput s@(c:cs)
     | isNumChar c = let (wd, tl) = span isNumChar s
-                    in if wd / =  []
+                    in if wd /=  []
                        then wd : cutInput tl
                        else [c]:cutInput cs
     | otherwise = [c] : cutInput cs
-    where isNumChar a = isDigit a || a = = '.'
+    where isNumChar a = isDigit a || a == '.'
 
 -- tokenize crea un token (o falla) a partir de una cadena
 tokenize :: String -> Maybe JSONToken
@@ -157,7 +157,7 @@ pToken t =
     Parser $ \s ->
         case s of
           []      -> []
-          (t':ts) -> if   t = = t'
+          (t':ts) -> if   t == t'
                      then [(t, ts)]
                      else []
 

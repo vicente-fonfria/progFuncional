@@ -45,7 +45,7 @@ type Empleados = [Empleado]
 empleados :: Empleados 
 empleados = [juan,pedro,jose]
 
-isEven n = n `mod` 2 = = 0
+isEven n = n `mod` 2 == 0
 
 l1 = [x | x <- [1,2,3,4]]
 l2 = [x | x <- [1,2,3,4], isEven x]

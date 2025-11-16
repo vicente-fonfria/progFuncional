@@ -61,7 +61,7 @@ entriesOf obj = obj
 containsKey :: Key -> [Key] -> Bool
 containsKey _ [] = False
 containsKey k (x:xs)
-  | k = = x = True
+  | k == x = True
   | otherwise = containsKey k xs
 
 
