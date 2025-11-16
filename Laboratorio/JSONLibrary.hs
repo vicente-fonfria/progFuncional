@@ -82,7 +82,7 @@ rightJoin :: Object a -> Object a -> Object a
 rightJoin o1 o2 =
   let ks2 = keysOf o2
       onlyLeft = filter (\(k, _) -> not (containsKey k ks2)) o1
-  in o2 ++ onlyLeft
+  in onlyLeft ++ o2
 
 -- Dado un predicado sobre objetos JSON, y un arreglo, construye el
 -- arreglo con los elementos que satisfacen el predicado.
