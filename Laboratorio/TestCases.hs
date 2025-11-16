@@ -16,11 +16,11 @@ type Message = String
 -- La función assertEq testea si a y b son valores estructuralmente iguales.
 -- Si no lo son, se construye la falla con el mensaje m.
 assertEq :: Eq a => Message -> a -> a -> TestRes
-assertEq m a b = if a = = b then Ok else Fail m
+assertEq m a b = if a == b then Ok else Fail m
 
 -- tipo algebraico que enumera los tests a realizar
 data TestSet
- = Show'
+  = Show'
 
   | LookupField | LookupFieldObj | KeysOf | ValuesOf | EntriesOf
   | LeftJoin | RightJoin | FilterArray | InsertKV | ConsKV | SortKeys
@@ -128,7 +128,7 @@ illty 4 = TyObject [("1", TyNull),("4", TyArray TyNull),("2", TyNull)]
 
 -- curso dummy, solo los campos que interesan para testear 
 mkcurso anio semestre codigo
- = JObject
+  = JObject
     [ ("nombre", JString "")
     , ("codigo", JNumber codigo)
     , ("anio", JNumber anio)
@@ -300,7 +300,7 @@ est 11 = JObject
 -- correspondiente a cada conjunto de tests, 
 
 tests LookupField
- = assertEq "lookupField 1"
+  = assertEq "lookupField 1"
     (lookupField (jval 1) "number")
     (Just (JNumber 12))
 
@@ -342,7 +342,7 @@ tests LookupField
   : []
 
 tests LookupFieldObj
- = assertEq "lookupFieldObj 1"
+  = assertEq "lookupFieldObj 1"
     (lookupFieldObj (oval 3) "6")
     (Just (JNumber 1))
 
@@ -353,7 +353,7 @@ tests LookupFieldObj
   : []
 
 tests KeysOf
- =  assertEq "keysOf 1"
+  =  assertEq "keysOf 1"
      (keysOf (oval 1))
      ["1", "2", "3"]
 
@@ -376,7 +376,7 @@ tests KeysOf
      : []
 
 tests ValuesOf
- = assertEq "valuesOf 1"
+  = assertEq "valuesOf 1"
     (valuesOf (oval 1))
     (take 3 (repeat (JNumber 1)))
 
@@ -395,13 +395,13 @@ tests ValuesOf
   : []
 
 tests EntriesOf
- = [assertEq ("entriesOf " ++ show i) (zip (keysOf (oval i)) (valuesOf (oval i)))
+  = [assertEq ("entriesOf " ++ show i) (zip (keysOf (oval i)) (valuesOf (oval i)))
                                       (entriesOf (oval i))
     | i <- [1,2,3]]
 
 
 tests LeftJoin
- = assertEq "leftJoin 1"
+  = assertEq "leftJoin 1"
        (leftJoin (oval 1)(oval 2))
        (oval 1)
 
@@ -425,7 +425,7 @@ tests LeftJoin
   : []
 
 tests RightJoin
- = assertEq "rightJoin 1"
+  = assertEq "rightJoin 1"
      (rightJoin (oval 1) (oval 4))
      [("2", JNumber 1), ("3", JNumber 1), ("1",JNull)]
 
@@ -444,7 +444,7 @@ tests RightJoin
   : []
 
 tests FilterArray
- = assertEq "filterArray 1"
+  = assertEq "filterArray 1"
      (filterArray (isJNull) ((fromJust . fromJArray) (jval 2)))
      [JNull,JNull]
 
@@ -463,7 +463,7 @@ tests FilterArray
   : []
 
 tests InsertKV
- = assertEq "insertKV 1"
+  = assertEq "insertKV 1"
     (insertKV ("4", JNull) (oval 1))
     [("1",JNumber 1),("2",JNumber 1),("3",JNumber 1),("4",JNull)]
 
@@ -478,7 +478,7 @@ tests InsertKV
   : []
 
 tests SortKeys
- = assertEq "sortKeys 1"
+  = assertEq "sortKeys 1"
      (sortKeys $ oval 1)
      (oval 1)
 
@@ -563,7 +563,7 @@ tests ObjectWf
   : []
 
 tests TypeOf
- = assertEq "typeOf 1"
+  = assertEq "typeOf 1"
      (typeOf (jval 1))
      (jty 1)
 
@@ -613,7 +613,7 @@ tests TypeOf
                     ("semestre", TyNum)]
 
 tests HasType
- = assertEq "hasType 1"
+  = assertEq "hasType 1"
     (hasType (jval 1) (fromJust $ jty 1)) True
 
   : assertEq "hasType 2"
@@ -625,7 +625,7 @@ tests HasType
   :[]
 
 tests EstaBienFormadoEstudiante
- = assertEq "estaBienFormadoEstudiante 1"
+  = assertEq "estaBienFormadoEstudiante 1"
      (estaBienFormadoEstudiante (est 1))
      True
 
@@ -664,7 +664,7 @@ tests EstaBienFormadoEstudiante
   : []
 
 tests Get
- = assertEq "get 1"
+  = assertEq "get 1"
      (getCI (est 1))
      (Just 12345678)
 
@@ -693,7 +693,7 @@ tests Get
   : []
 
 tests Aprobados
- = assertEq "aprobados 1"
+  = assertEq "aprobados 1"
      (aprobados (est 2))
      (Just (JObject
      [ ("nombre", JString "Haskell")
@@ -722,7 +722,7 @@ tests Aprobados
   
 
 tests EnAnio
- = assertEq "enAnio 1"
+  = assertEq "enAnio 1"
     (enAnio 3 (est 1))
     (Just (JArray
         [mkcurso 3 2 1,
@@ -735,7 +735,7 @@ tests EnAnio
   : []
 
 tests PromedioEscolaridad
- = assertEq "promedioEscolaridad 1"
+  = assertEq "promedioEscolaridad 1"
       (promedioEscolaridad (est 2))
       (Just ((1 + 7 + 2 + 12 + 0 + 0) /6))
 
@@ -751,13 +751,13 @@ tests PromedioEscolaridad
 tests Show' =
   map
     (\a ->
-       if a = = ((read :: String -> JSON) . show) a
+       if a == ((read :: String -> JSON) . show) a
          then Ok
          else Fail "show")
     ([jval n | n <- [1, 2]] ++ map JObject [oval n | n <- [1..4]])
 
 tests AddCurso
- = assertEq "addCurso 1"
+  = assertEq "addCurso 1"
     (addCurso (fromJust $ fromJObject $ mkcurso 4 1 10) .
      addCurso (fromJust $ fromJObject $ mkcurso 3 2 9)  .
      addCurso (fromJust $ fromJObject $ mkcurso 3 2 11) .
@@ -786,7 +786,7 @@ allTests = concat [tests a | a <- [Show' .. AddCurso]]
 
 main :: IO ()
 main =
-  case filter (/ = Ok) allTests of
+  case filter (/= Ok) allTests of
     [] -> putStrLn "Todos los tests Ok!"
     l  -> sequence_ $ map f l
       where f (Fail m) = putStrLn $ "Fallo en test: " ++ m
@@ -794,16 +794,16 @@ main =
 
 
 instance Eq JSON where
-  (JString s) = = (JString t)
- = s = = t
-  (JNumber n) = = (JNumber m)
- = n = = m
-  (JBoolean b) = = (JBoolean c)
- = b = = c
-  JNull = = JNull
- = True
-  JObject o = = JObject p
- = sortKeys o = = sortKeys p
-  JArray r = = JArray s
- = r = = s
-  _ = = _ = False
+  (JString s) == (JString t)
+    = s == t
+  (JNumber n) == (JNumber m)
+    = n == m
+  (JBoolean b) == (JBoolean c)
+    = b == c
+  JNull == JNull
+    = True
+  JObject o == JObject p
+    = sortKeys o == sortKeys p
+  JArray r == JArray s
+    = r == s
+  _ == _ = False
